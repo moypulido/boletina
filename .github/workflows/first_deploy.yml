@@ -21,11 +21,8 @@ jobs:
           HOSTINGER_USER: ${{ secrets.HOSTINGER_USER }}
           HOSTINGER_PASS: ${{ secrets.HOSTINGER_PASS }}
         run: |
-          # Crear el directorio si no existe
-          sshpass -p "${{ env.HOSTINGER_PASS }}" ssh -o StrictHostKeyChecking=no -p 65002 ${{ env.HOSTINGER_USER }}@${{ env.HOSTINGER_HOST }} "mkdir -p ~/domains/moisespulido.com/my_laravel_app"
-
           # Sincronizar los archivos al servidor
-          sshpass -p "${{ env.HOSTINGER_PASS }}" rsync -avz -e "ssh -p 65002" . ${{ env.HOSTINGER_USER }}@${{ env.HOSTINGER_HOST }}:~/domains/moisespulido.com/my_laravel_app
+          sshpass -p "${{ env.HOSTINGER_PASS }}" rsync -avz -e "ssh -p 65002" . ${{ env.HOSTINGER_USER }}@${{ env.HOSTINGER_HOST }}:~/domains/moisespulido.com/boletina
 
           # Cambiar al directorio y ejecutar comandos de caché
-          sshpass -p "${{ env.HOSTINGER_PASS }}" ssh -o StrictHostKeyChecking=no -p 65002 ${{ env.HOSTINGER_USER }}@${{ env.HOSTINGER_HOST }} "cd ~/domains/moisespulido.com/my_laravel_app && php artisan config:cache && php artisan route:cache"
+          sshpass -p "${{ env.HOSTINGER_PASS }}" ssh -o StrictHostKeyChecking=no -p 65002 ${{ env.HOSTINGER_USER }}@${{ env.HOSTINGER_HOST }} "cd ~/domains/moisespulido.com/boletina && php artisan config:cache && php artisan route:cache"
