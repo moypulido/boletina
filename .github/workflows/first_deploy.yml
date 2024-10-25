@@ -8,52 +8,24 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Check out code
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      - name: Set up PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.1'
-          extensions: mbstring, bcmath, gd
-          ini-values: post_max_size=256M, upload_max_filesize=256M
-          coverage: none
+      - name: Install SSH Client
+        run: sudo apt-get install -y sshpass
 
-      - name: Install Composer dependencies
-        run: |
-          composer install --no-interaction --prefer-dist --optimize-autoloader
-
-      - name: Build assets
-        run: |
-          npm install && npm run build
-
-      - name: Upload project files via SSH
+      - name: Deploy to Hostinger
         env:
           HOSTINGER_HOST: ${{ secrets.HOSTINGER_HOST }}
           HOSTINGER_USER: ${{ secrets.HOSTINGER_USER }}
           HOSTINGER_PASS: ${{ secrets.HOSTINGER_PASS }}
         run: |
-          sshpass -p "${{ env.HOSTINGER_PASS }}" ssh -o StrictHostKeyChecking=no -p 65002 ${{ env.HOSTINGER_USER }}@${{ env.HOSTINGER_HOST }} "mkdir -p ~/my_laravel_app"
-          sshpass -p "${{ env.HOSTINGER_PASS }}" rsync -avz -e "ssh -p 65002" --exclude '.env' --exclude 'storage/' --exclude 'node_modules/' --delete . ${{ env.HOSTINGER_USER }}@${{ env.HOSTINGER_HOST }}:~/my_laravel_app
+          # Crear el directorio si no existe
+          sshpass -p "${{ env.HOSTINGER_PASS }}" ssh -o StrictHostKeyChecking=no -p 65002 ${{ env.HOSTINGER_USER }}@${{ env.HOSTINGER_HOST }} "mkdir -p ~/domains/moisespulido.com/my_laravel_app"
 
-      - name: Configure .env
-        env:
-          HOSTINGER_HOST: ${{ secrets.HOSTINGER_HOST }}
-          HOSTINGER_USER: ${{ secrets.HOSTINGER_USER }}
-          HOSTINGER_PASS: ${{ secrets.HOSTINGER_PASS }}
-        run: |
-          sshpass -p "${{ env.HOSTINGER_PASS }}" ssh -o StrictHostKeyChecking=no -p 65002 ${{ env.HOSTINGER_USER }}@${{ env.HOSTINGER_HOST }} "echo 'DB_CONNECTION=mysql' > ~/my_laravel_app/.env"
-          sshpass -p "${{ env.HOSTINGER_PASS }}" ssh -o StrictHostKeyChecking=no -p 65002 ${{ env.HOSTINGER_USER }}@${{ env.HOSTINGER_HOST }} "echo 'DB_HOST=moisespulido.com' >> ~/my_laravel_app/.env"
-          sshpass -p "${{ env.HOSTINGER_PASS }}" ssh -o StrictHostKeyChecking=no -p 65002 ${{ env.HOSTINGER_USER }}@${{ env.HOSTINGER_HOST }} "echo 'DB_DATABASE=u612496818_boletina' >> ~/my_laravel_app/.env"
-          sshpass -p "${{ env.HOSTINGER_PASS }}" ssh -o StrictHostKeyChecking=no -p 65002 ${{ env.HOSTINGER_USER }}@${{ env.HOSTINGER_HOST }} "echo 'DB_USERNAME=u612496818_root' >> ~/my_laravel_app/.env"
-          sshpass -p "${{ env.HOSTINGER_PASS }}" ssh -o StrictHostKeyChecking=no -p 65002 ${{ env.HOSTINGER_USER }}@${{ env.HOSTINGER_HOST }} "echo 'DB_PASSWORD=Boletina123' >> ~/my_laravel_app/.env"
+          # Sincronizar los archivos al servidor
+          sshpass -p "${{ env.HOSTINGER_PASS }}" rsync -avz -e "ssh -p 65002" . ${{ env.HOSTINGER_USER }}@${{ env.HOSTINGER_HOST }}:~/domains/moisespulido.com/my_laravel_app
 
-      - name: Restart PHP-FPM or clear cache
-        env:
-          HOSTINGER_HOST: ${{ secrets.HOSTINGER_HOST }}
-          HOSTINGER_USER: ${{ secrets.HOSTINGER_USER }}
-          HOSTINGER_PASS: ${{ secrets.HOSTINGER_PASS }}
-        run: |
-          sshpass -p "${{ env.HOSTINGER_PASS }}" ssh -o StrictHostKeyChecking=no -p 65002 ${{ env.HOSTINGER_USER }}@${{ env.HOSTINGER_HOST }} "cd ~/my_laravel_app && php artisan config:cache && php artisan route:cache && php artisan view:cache"
+          # Cambiar al directorio y ejecutar comandos de caché
+          sshpass -p "${{ env.HOSTINGER_PASS }}" ssh -o StrictHostKeyChecking=no -p 65002 ${{ env.HOSTINGER_USER }}@${{ env.HOSTINGER_HOST }} "cd ~/domains/moisespulido.com/my_laravel_app && php artisan config:cache && php artisan route:cache"
