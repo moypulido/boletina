@@ -46,9 +46,9 @@ jobs:
         run: |
           sshpass -p "${{ env.HOSTINGER_PASS }}" ssh -o StrictHostKeyChecking=no -p 65002 ${{ env.HOSTINGER_USER }}@${{ env.HOSTINGER_HOST }} "echo 'DB_CONNECTION=mysql' > ~/my_laravel_app/.env"
           sshpass -p "${{ env.HOSTINGER_PASS }}" ssh -o StrictHostKeyChecking=no -p 65002 ${{ env.HOSTINGER_USER }}@${{ env.HOSTINGER_HOST }} "echo 'DB_HOST=moisespulido.com' >> ~/my_laravel_app/.env"
-          sshpass -p "${{ env.HOSTINGER_PASS }}" ssh -o StrictHostKeyChecking=no -p 65002 ${{ env.HOSTINGER_USER }}@${{ env.HOSTINGER_HOST }} "echo 'DB_DATABASE=u612496818_boletinaceti' >> ~/my_laravel_app/.env"
+          sshpass -p "${{ env.HOSTINGER_PASS }}" ssh -o StrictHostKeyChecking=no -p 65002 ${{ env.HOSTINGER_USER }}@${{ env.HOSTINGER_HOST }} "echo 'DB_DATABASE=u612496818_boletina' >> ~/my_laravel_app/.env"
           sshpass -p "${{ env.HOSTINGER_PASS }}" ssh -o StrictHostKeyChecking=no -p 65002 ${{ env.HOSTINGER_USER }}@${{ env.HOSTINGER_HOST }} "echo 'DB_USERNAME=u612496818_root' >> ~/my_laravel_app/.env"
-          sshpass -p "${{ env.HOSTINGER_PASS }}" ssh -o StrictHostKeyChecking=no -p 65002 ${{ env.HOSTINGER_USER }}@${{ env.HOSTINGER_HOST }} "echo 'DB_PASSWORD=DbHostMoisesBoletina3906*' >> ~/my_laravel_app/.env"
+          sshpass -p "${{ env.HOSTINGER_PASS }}" ssh -o StrictHostKeyChecking=no -p 65002 ${{ env.HOSTINGER_USER }}@${{ env.HOSTINGER_HOST }} "echo 'DB_PASSWORD=Boletina123' >> ~/my_laravel_app/.env"
 
       - name: Run Migrations
         env:
