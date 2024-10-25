@@ -1,0 +1,55 @@
+name: Deploy Laravel to Hostinger
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: mbstring, bcmath, gd
+          ini-values: post_max_size=256M, upload_max_filesize=256M
+          coverage: none
+
+      - name: Install Composer dependencies
+        run: |
+          composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Build assets
+        run: |
+          npm install && npm run prod
+
+      - name: Upload project files via SSH
+        env:
+          HOSTINGER_HOST: ${{ secrets.HOSTINGER_HOST }}
+          HOSTINGER_USER: ${{ secrets.HOSTINGER_USER }}
+          HOSTINGER_PASS: ${{ secrets.HOSTINGER_PASS }}
+        run: |
+          sshpass -p "${{ env.HOSTINGER_PASS }}" ssh -o StrictHostKeyChecking=no -p 65002 ${{ env.HOSTINGER_USER }}@${{ env.HOSTINGER_HOST }} "mkdir -p ~/my_laravel_app"
+          sshpass -p "${{ env.HOSTINGER_PASS }}" rsync -avz --exclude '.env' --exclude 'storage/' --exclude 'node_modules/' --delete . ${{ env.HOSTINGER_USER }}@${{ env.HOSTINGER_HOST }}:~/my_laravel_app
+
+      - name: Run Migrations
+        env:
+          HOSTINGER_HOST: ${{ secrets.HOSTINGER_HOST }}
+          HOSTINGER_USER: ${{ secrets.HOSTINGER_USER }}
+          HOSTINGER_PASS: ${{ secrets.HOSTINGER_PASS }}
+        run: |
+          sshpass -p "${{ env.HOSTINGER_PASS }}" ssh -o StrictHostKeyChecking=no -p 65002 ${{ env.HOSTINGER_USER }}@${{ env.HOSTINGER_HOST }} "cd ~/my_laravel_app && php artisan migrate --force"
+
+      - name: Restart PHP-FPM or clear cache
+        env:
+          HOSTINGER_HOST: ${{ secrets.HOSTINGER_HOST }}
+          HOSTINGER_USER: ${{ secrets.HOSTINGER_USER }}
+          HOSTINGER_PASS: ${{ secrets.HOSTINGER_PASS }}
+        run: |
+          sshpass -p "${{ env.HOSTINGER_PASS }}" ssh -o StrictHostKeyChecking=no -p 65002 ${{ env.HOSTINGER_USER }}@${{ env.HOSTINGER_HOST }} "cd ~/my_laravel_app && php artisan config:cache && php artisan route:cache && php artisan view:cache"
