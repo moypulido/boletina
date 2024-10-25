@@ -50,14 +50,6 @@ jobs:
           sshpass -p "${{ env.HOSTINGER_PASS }}" ssh -o StrictHostKeyChecking=no -p 65002 ${{ env.HOSTINGER_USER }}@${{ env.HOSTINGER_HOST }} "echo 'DB_USERNAME=u612496818_root' >> ~/my_laravel_app/.env"
           sshpass -p "${{ env.HOSTINGER_PASS }}" ssh -o StrictHostKeyChecking=no -p 65002 ${{ env.HOSTINGER_USER }}@${{ env.HOSTINGER_HOST }} "echo 'DB_PASSWORD=Boletina123' >> ~/my_laravel_app/.env"
 
-      - name: Run Migrations
-        env:
-          HOSTINGER_HOST: ${{ secrets.HOSTINGER_HOST }}
-          HOSTINGER_USER: ${{ secrets.HOSTINGER_USER }}
-          HOSTINGER_PASS: ${{ secrets.HOSTINGER_PASS }}
-        run: |
-          sshpass -p "${{ env.HOSTINGER_PASS }}" ssh -o StrictHostKeyChecking=no -p 65002 ${{ env.HOSTINGER_USER }}@${{ env.HOSTINGER_HOST }} "cd ~/my_laravel_app && php artisan migrate --force"
-
       - name: Restart PHP-FPM or clear cache
         env:
           HOSTINGER_HOST: ${{ secrets.HOSTINGER_HOST }}
