@@ -27,7 +27,7 @@ jobs:
 
       - name: Build assets
         run: |
-          npm install && npm run prod
+          npm install && npm run build
 
       - name: Upload project files via SSH
         env:
