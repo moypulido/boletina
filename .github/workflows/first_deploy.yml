@@ -20,6 +20,7 @@ jobs:
           HOSTINGER_HOST: ${{ secrets.HOSTINGER_HOST }}
           HOSTINGER_USER: ${{ secrets.HOSTINGER_USER }}
           HOSTINGER_PASS: ${{ secrets.HOSTINGER_PASS }}
+
         run: |
           # Crear el directorio si no existe
           sshpass -p "${{ env.HOSTINGER_PASS }}" ssh -o StrictHostKeyChecking=no -p 65002 ${{ env.HOSTINGER_USER }}@${{ env.HOSTINGER_HOST }} "mkdir -p ~/domains/moisespulido.com/boletina"
